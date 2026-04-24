@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schack</title>
+    <link rel="stylesheet" href="schack.css">
+</head>
+<body>
+    <!-- ===== START-MENY ===== -->
+<div id="startMeny">
+  <div class="titel">♟  SCHACK</div>
+  <p class="undertitel">Klassiskt spel</p>
+
+  <div class="meny-sektion">
+    <h3>Spelläge</h3>
+    <div class="val-grupp">
+      <button class="val-knapp aktiv" data-grupp="lage" data-val="enspelare">🤖 En spelare</button>
+      <button class="val-knapp" data-grupp="lage" data-val="tvaspelare">👥 Två spelare</button>
+    </div>
+  </div>
+
+  <div class="meny-sektion" id="botSvarighetsSektion">
+    <h3>Bot-svårighetsgrad</h3>
+    <div class="val-grupp">
+      <button class="val-knapp" data-grupp="bot" data-val="1">Lätt</button>
+      <button class="val-knapp aktiv" data-grupp="bot" data-val="2">Medium</button>
+      <button class="val-knapp" data-grupp="bot" data-val="3">Svår</button>
+    </div>
+  </div>
+
+  <div class="meny-sektion">
+    <h3>Schackklocka</h3>
+    <div class="val-grupp">
+      <button class="val-knapp aktiv" data-grupp="klocka" data-val="ingen">Ingen klocka</button>
+      <button class="val-knapp" data-grupp="klocka" data-val="klocka">Med klocka</button>
+    </div>
+    <div id="klockainStallningar" style="display:none; margin-top:12px;">
+      <div class="tid-input-rad">
+        <label>Tid per spelare (min):</label>
+        <input class="tid-input" type="number" id="klockaTid" value="10" min="1" max="60" />
+      </div>
+      <div style="margin-top:10px;">
+        <div class="val-grupp">
+          <button class="val-knapp aktiv" data-grupp="inkrement" data-val="0">Inget tillägg</button>
+          <button class="val-knapp" data-grupp="inkrement" data-val="3">+3 sek/drag</button>
+          <button class="val-knapp" data-grupp="inkrement" data-val="5">+5 sek/drag</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="start-knapp" id="startKnapp">Starta spel</button>
+</div>
+</body>
+</html>
