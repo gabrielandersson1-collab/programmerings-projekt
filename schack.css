@@ -1,0 +1,227 @@
+/* ===== GLOBALA VARIABLER & RESET ===== */
+
+
+/* :root fungerar som ett globalt scope för CSS-variabler (typ konstanter) */
+/* Gör det lätt att ändra tema/färger utan att ändra överallt (DRY-princip) */
+    :root {
+      --bakgrund: rgb(13, 13, 13);  /* Huvudbakgrund (dark mode theme) */
+      --yta: rgb(26, 26, 26);       /* UI-yta (kort/sektioner) */
+      --kant: rgb(46, 46, 46);        /* Borders (visuell separation) */
+
+       /* Schackbrädets färger */
+      --ljus-ruta: rgb(240, 217, 181);
+      --mork-ruta: rgb(181, 136, 99);
+
+       /* Highlight-system (visual feedback till användaren) */
+      --markerad: rgba(20, 200, 80, 0.55);
+      --mojligt-drag: rgba(20, 180, 255, 0.45);
+      --vald-pjas: rgba(255, 220, 0, 0.55);
+      --check-farg: rgba(255, 50, 50, 0.65);
+
+      /* Textfärger */
+      --text: rgb(232, 232, 232);
+      --text-dim: rgb(136, 136, 136);
+
+       /* Accentfärger (UI feedback / interaktion) */
+      --accent: rgb(232, 200, 74);
+      --accent2: rgb(91, 163, 245);
+
+      /* Spelarfärger (kan användas för UI-indikatorer) */
+      --vit-spelare: rgb(245, 245, 245);
+      --svart-spelare: rgb(28, 28, 28);
+
+      /* Knappsystem */
+      --knapp-bg: rgb(42, 42, 42);
+      --knapp-hover: rgb(58, 58, 58);
+
+      /* Klockans state (aktiv/inaktiv spelare) */
+      --klocka-aktiv: rgb(232, 200, 74);
+      --klocka-inaktiv: rgb(68, 68, 68);
+      /* Responsiv storlek (använder CSS-funktion min()) */
+      /* Gör att brädet aldrig blir större än 560px eller 90% av viewport */
+      --bord-storlek: min(560px, 90vw);
+
+      /* Reset = tar bort default styling från browsern (cross-browser consistency) */
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }  /* Gör layout mer förutsägbar (inkluderar padding i width) */
+
+    /* ===== BODY / ROOT LAYOUT ===== */
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bakgrund);
+      color: var(--text);
+      min-height: 100vh;  /* minst hela skärmen (viewport height) */
+
+    /* Flexbox = layout engine (centrerar innehåll) */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* ===== START-MENY ===== */
+
+    /* Container för startmenyn */
+    #startMeny {
+      display: flex;
+      flex-direction: column; /* vertikal layout */
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 20px;
+    }
+
+    /* Titel (visuell hierarki – viktig info först) */
+    .titel {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: var(--accent);
+       /* glow-effekt = bättre UX / feedback */
+      text-shadow: 0 0 30px rgba(232,200,74,0.3);
+      margin-bottom: 10px;
+    }
+    /* Undertitel – mindre viktig info (secondary text) */
+    .undertitel {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    /* Kort/sektioner i menyn */
+    .meny-sektion {
+      background: var(--yta);
+      border: 1px solid var(--kant);
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+    }
+    /* Rubrik i sektioner */
+    .meny-sektion h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+    .val-grupp {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .val-knapp {
+      flex: 1;
+      min-width: 100px;
+      padding: 12px 8px;
+      background: var(--knapp-bg);
+      border: 2px solid var(--kant);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      cursor: pointer; /* visar att det är interaktivt */
+      /* Transition = animation mellan states (hover, active) */
+      transition: all 0.2s;
+      text-align: center;
+    }
+    /* Hover-state (feedback när användaren interagerar) */
+    .val-knapp:hover { background: var(--knapp-hover); border-color: #555; }
+    /* Aktiv state (representerar current state i UI) */
+    .val-knapp.aktiv { border-color: var(--accent); color: var(--accent); background: rgba(232,200,74,0.1); }
+
+    /* Rad med input + label */
+    .tid-input-rad {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    /* Label styling */
+    .tid-input-rad label { font-size: 0.85rem; color: var(--text-dim); white-space: nowrap; }
+
+    /* Inputfält */
+    .tid-input {
+      background: var(--knapp-bg);
+      border: 1px solid var(--kant);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      width: 70px;
+      text-align: center;
+    }
+
+    /* Focus-state (när användaren klickar i input) */
+    .tid-input:focus { outline: none; border-color: var(--accent); }
+
+    /* Startknapp (primary action / CTA) */
+    .start-knapp {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: #111;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+    /* Hover-effekt (microinteraction) */
+    .start-knapp:hover { background: rgb(240, 208, 96); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(232,200,74,0.3); }
+
+    /* ===== SPEL-LAYOUT ===== */
+    #spelVy { display: none; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+
+    /* ===== SCHACKBRÄDE ===== */
+    .brade-wrapper {
+      position: relative;
+      width: var(--bord-storlek);
+      height: var(--bord-storlek);
+    }
+    #brade {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      border: 2px solid var(--kant);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .ruta {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .ruta.ljus { background: var(--ljus-ruta); }
+    .ruta.mork  { background: var(--mork-ruta); }
+    .ruta.vald  { background: var(--vald-pjas) !important; }
+    .ruta.mojligt::after {
+      content: '';
+      position: absolute;
+      width: 32%;
+      height: 32%;
+      background: var(--mojligt-drag);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: dykUpp 0.18s ease;
+    }
+    /* Om rutan har en fiende-pjas: visa ring istället */
+    .ruta.mojligt.har-pjas::after {
+      width: 92%;
+      height: 92%;
+      background: transparent;
+      border: 4px solid var(--mojligt-drag);
+      border-radius: 3px;
+    }
+    @keyframes dykUpp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .ruta.check-kung { background: var(--check-farg) !important; }
+    .ruta.sist-drag { background: var(--markerad) !important; }

@@ -52,5 +52,54 @@
 
   <button class="start-knapp" id="startKnapp">Starta spel</button>
 </div>
+
+<!-- ===== SPEL-VY ===== -->
+<div id="spelVy">
+  <!-- Övre spelarinformation (Svart / Motståndare) -->
+  <div class="spelar-info" id="overSpelareInfo">
+    <div>
+      <div class="spelar-namn" id="overSpelarnamn">Svart</div>
+      <div class="tagna-pjasar" id="overTagna"></div>
+    </div>
+    <div class="klocka-display" id="overKlocka" style="display:none">10:00</div>
+  </div>
+
+  <!-- Knappar för motståndaren (svart/bot) -->
+  <div class="spel-knappar" id="overKnappar">
+    <button class="ge-upp-knapp" id="overGeUpp">🏳️ Ge upp</button>
+    <button class="remi-knapp"   id="overRemi">🤝 Erbjud remi</button>
+  </div>
+
+  <!-- Bräde + animationsöverlager -->
+  <div class="brade-wrapper">
+    <div id="brade"></div>
+    <div class="tanker-indikator" id="tankerIndikator">Bot tänker<span class="prickar"></span></div>
+  </div>
+
+  <!-- Info-rad med status och meny-knapp -->
+  <div class="info-rad">
+    <span class="status-text" id="statusText">Vit börjar</span>
+    <button class="meny-knapp" id="tillMenyKnapp">Avsluta</button>
+  </div>
+
+   <!-- Knappar för vit (undre spelare) -->
+  <div class="spel-knappar" id="underKnappar">
+    <button class="ge-upp-knapp" id="underGeUpp">🏳️ Ge upp</button>
+    <button class="remi-knapp"   id="underRemi">🤝 Erbjud remi</button>
+  </div>
+
+  <!-- Undre spelarinformation (Vit / Du) -->
+  <div class="spelar-info" id="underSpelareInfo">
+    <div>
+      <div class="spelar-namn" id="underSpelarnamn">Vit</div>
+      <div class="tagna-pjasar" id="underTagna"></div>
+    </div>
+    <div class="klocka-display" id="underKlocka" style="display:none">10:00</div>
+  </div>
+
+  <!-- Draghistorik i schack-notation -->
+  <div id="dragHistorik"></div>
+</div>
+
 </body>
 </html>
