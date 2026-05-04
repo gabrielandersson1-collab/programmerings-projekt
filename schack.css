@@ -225,3 +225,86 @@
     @keyframes dykUpp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .ruta.check-kung { background: var(--check-farg) !important; }
     .ruta.sist-drag { background: var(--markerad) !important; }
+
+     /* ===== PJÄSER ===== */
+    .pjas {
+      width: 80%;
+      height: 80%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(var(--bord-storlek) / 11);
+      user-select: none;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.12s ease;
+      cursor: pointer;
+    }
+    .pjas:hover { transform: scale(1.12); }
+
+    /* ===== KOORDINATER ===== */
+    .koordinat {
+      position: absolute;
+      font-size: 10px;
+      font-weight: 700;
+      opacity: 0.55;
+      pointer-events: none;
+      line-height: 1;
+    }
+    .koordinat.bokstav { bottom: 2px; right: 3px; }
+    .koordinat.siffra  { top: 2px; left: 3px; }
+    .ruta.ljus .koordinat { color: var(--mork-ruta); }
+    .ruta.mork .koordinat { color: var(--ljus-ruta); }
+
+    /* ===== PJAS-TRANSITION (animation vid drag) ===== */
+    .pjas-animeras {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: left 0.22s cubic-bezier(0.4,0,0.2,1), top 0.22s cubic-bezier(0.4,0,0.2,1);
+      font-size: calc(var(--bord-storlek) / 11);
+    }
+
+    /* ===== INFO-RAD ===== */
+    .info-rad {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: var(--bord-storlek);
+    }
+    .status-text {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+    .meny-knapp {
+      padding: 7px 14px;
+      background: var(--knapp-bg);
+      border: 1px solid var(--kant);
+      border-radius: 6px;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .meny-knapp:hover { background: var(--knapp-hover); color: var(--text); }
+
+    /* ===== DRAGHISTORIK ===== */
+    #dragHistorik {
+      width: var(--bord-storlek);
+      max-height: 120px;
+      overflow-y: auto;
+      background: var(--yta);
+      border: 1px solid var(--kant);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-content: flex-start;
+    }
+    .drag-post { color: var(--text); }
+    .drag-nummer { color: var(--text-dim); }
+    

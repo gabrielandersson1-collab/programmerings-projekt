@@ -2,7 +2,6 @@
 // ===== KONSTANTER: Pjästyper & färger =====
 // Vi använder heltal för att representera pjäserna i brädet – snabbare än strängar
 
-
 const TOM   = 0;
 const KUNG  = 1;
 const DAM   = 2;
@@ -89,25 +88,42 @@ function skapaStartBrade() {
   ];
 }
 
+// ============================================================
+// INITIERA SPELET
+// Sätter upp all state och ritar om brädet
+// ============================================================
 function initiieraSpel() {
-  brade            = skapaStartBrade();
-  aktivFarg        = VIT;
-  valdRuta         = null;
-  mojligaDrag      = [];
-  spelOver         = false;
-  botTanker        = false;
-  enPassantMal     = null;
+  brade = skapaStartBrade();
+  aktivFarg = VIT;
+  valdRuta = null;
+  mojligaDrag = [];
+  spelOver = false;
+  botTanker = false;
+  enPassantMal = null;
   dragHistorikData = [];
-  sistaFranRuta    = null;
-  sistaThillRuta   = null;
-  tagnaPjasar      = { [VIT]: [], [SVART]: [] };
+  sistaFranRuta = null;
+  sistaThillRuta = null;
+  tagnaPjasar = { [VIT]: [], [SVART]: [] };
+
+  // Rokad-flaggor – ingen har rört sig i startposition
   kungHarRort      = { [VIT]: false, [SVART]: false };
   tornHarRort      = { [VIT]: { vanster: false, hoger: false }, [SVART]: { vanster: false, hoger: false } };
+
+  // Sätt upp klockor
   tidKvar          = { [VIT]: startTidSek, [SVART]: startTidSek };
   if (klockInterval) clearInterval(klockInterval);
+  klockInterval = null;
 
   ritaBrade();
-  if (dragHistEl) dragHistEl.innerHTML = '';
+  uppdateraInfoRad();
+  uppdateraKlockor();
+  uppdateraTagnaPjasar();
+  dragHistEl.innerHTML = '';
+
+  // Starta klockan om inställt
+  if (anvandKlocka) startaKlocka();
+
+  
 }
 // ============================================================
 // RITA BRÄDET (rendering)
@@ -176,6 +192,171 @@ function ritaBrade() {
     }
   }
 }
+
+// ============================================================
+// HANTERA KLICK PÅ RUTA (spellogik / state machine)
+// ============================================================
+function hanteraRutaKlick(rad, kol) {
+  // Avbryt om spelet är slut eller boten tänker
+  if (spelOver || botTanker) return;
+  // I enspelarlage: bara vita pjäser är klickbara för spelaren
+  if (spelLage === 'enspelare' && aktivFarg === SVART) return;
+
+  const pjasVal  = brade[rad][kol];
+  const pjasFarg = pjasVal > 0 ? VIT : (pjasVal < 0 ? SVART : null);
+
+  // Alternativ 1: Vi har en pjäs vald och klickar på ett möjligt drag
+  if (valdRuta) {
+    const valtDrag = mojligaDrag.find(d => d.tillRad === rad && d.tillKol === kol);
+    if (valtDrag) {
+      utforDrag(valtDrag);
+      return;
+    }
+  }
+
+  // Alternativ 2: Klick på en pjäs som tillhör aktiv spelare
+  if (pjasFarg === aktivFarg) {
+    valdRuta     = { rad, kol };
+    mojligaDrag  = haemtaLegalaDrag(brade, rad, kol, aktivFarg, enPassantMal, kungHarRort, tornHarRort);
+    ritaBrade();
+    return;
+  }
+
+  // Alternativ 3: Klick på tom ruta eller fel sidas pjäs – avmarkera
+  valdRuta    = null;
+  mojligaDrag = [];
+  ritaBrade();
+}
+
+// ============================================================
+// UTFÖR ETT DRAG (med animation)
+// Drag-objektet innehåller: franRad, franKol, tillRad, tillKol,
+// och ev. specialTyp: 'rokad', 'enPassant', 'promotion'
+// ============================================================
+function utforDrag(drag) {
+  const { franRad, franKol, tillRad, tillKol } = drag;
+
+  // ===== ANIMERA PJÄSEN =====
+  // Räknar ut skärmkoordinater via getBoundingClientRect (DOM-API)
+  const rutorEl    = bradeEl.querySelectorAll('.ruta');
+  const franIndex  = franRad * 8 + franKol;
+  const tillIndex  = tillRad * 8 + tillKol;
+  const franRect   = rutorEl[franIndex].getBoundingClientRect();
+  const tillRect   = rutorEl[tillIndex].getBoundingClientRect();
+
+  const pjasVal    = brade[franRad][franKol];
+  const pjasFarg   = pjasVal > 0 ? VIT : SVART;
+  const pjasTyp    = Math.abs(pjasVal);
+
+  // Skapa ett "flygande" pjäs-element för animationen
+  const flygandeEl = document.createElement('div');
+  flygandeEl.className = 'pjas-animeras';
+  flygandeEl.textContent = PJAS_SYMBOLER[pjasFarg][pjasTyp];
+  flygandeEl.style.left   = franRect.left + 'px';
+  flygandeEl.style.top    = franRect.top  + 'px';
+  flygandeEl.style.width  = franRect.width + 'px';
+  flygandeEl.style.height = franRect.height + 'px';
+  flygandeEl.style.display = 'flex';
+  flygandeEl.style.alignItems = 'center';
+  flygandeEl.style.justifyContent = 'center';
+  document.body.appendChild(flygandeEl);
+
+  // requestAnimationFrame för smidig animation – krav för E-nivå!
+  requestAnimationFrame(() => {
+    flygandeEl.style.left = tillRect.left + 'px';
+    flygandeEl.style.top  = tillRect.top  + 'px';
+  });
+
+  // När animationen är klar: uppdatera spelstaten
+  setTimeout(() => {
+    flygandeEl.remove();
+    tillampaRiktigtDrag(drag);
+  }, 230);
+
+  // Göm pjäsen på originalet medan den animeras
+  rutorEl[franIndex].style.opacity = '0';
+  setTimeout(() => { if(rutorEl[franIndex]) rutorEl[franIndex].style.opacity = ''; }, 230);
+}
+
+// ============================================================
+// TILLÄMPA DRAGET PÅ BRÄDET (uppdaterar state)
+// ============================================================
+function tillampaRiktigtDrag(drag) {
+  const { franRad, franKol, tillRad, tillKol } = drag;
+  const pjasVal  = brade[franRad][franKol];
+  const pjasFarg = pjasVal > 0 ? VIT : SVART;
+  const pjasTyp  = Math.abs(pjasVal);
+  const motstandarFarg = -pjasFarg;
+
+  // Logga tagen pjäs (kollisionsdetektering – en viktig del av spellogiken)
+  if (brade[tillRad][tillKol] !== TOM) {
+    tagnaPjasar[pjasFarg].push(Math.abs(brade[tillRad][tillKol]));
+  }
+
+  // Utför grundläggande drag
+  brade[tillRad][tillKol] = pjasVal;
+  brade[franRad][franKol] = TOM;
+
+  // === SPECIALFALL: Rokad (lång och kort) ===
+  if (drag.specialTyp === 'kortRokad') {
+    // Flytta torn till vänster om kungen
+    brade[franRad][5] = pjasFarg * TORN;
+    brade[franRad][7] = TOM;
+    tornHarRort[pjasFarg].hoger = true;
+  } else if (drag.specialTyp === 'langRokad') {
+    brade[franRad][3] = pjasFarg * TORN;
+    brade[franRad][0] = TOM;
+    tornHarRort[pjasFarg].vanster = true;
+  }
+
+  // === SPECIALFALL: En passant ===
+  if (drag.specialTyp === 'enPassant') {
+    // Ta bort bonden som hoppade förbi
+    tagnaPjasar[pjasFarg].push(BONDE);
+    brade[franRad][tillKol] = TOM;
+  }
+
+  // === UPPDATERA EN PASSANT-MÅL ===
+  // Om en bonde hoppade två steg – sätt en-passant-målet
+  if (pjasTyp === BONDE && Math.abs(tillRad - franRad) === 2) {
+    enPassantMal = { rad: (franRad + tillRad) / 2, kol: franKol };
+  } else {
+    enPassantMal = null;
+  }
+
+  // === ROKAD-FLAGGOR ===
+  if (pjasTyp === KUNG) kungHarRort[pjasFarg] = true;
+  if (pjasTyp === TORN) {
+    if (franKol === 0) tornHarRort[pjasFarg].vanster = true;
+    if (franKol === 7) tornHarRort[pjasFarg].hoger   = true;
+  }
+
+  // === SCHACK-NOTATION ===
+  const dragNotation = byggNotation(drag, pjasTyp, pjasFarg, brade);
+  dragHistorikData.push(dragNotation);
+  uppdateraDragHistorik();
+
+  // === SENASTE DRAG (highlight) ===
+  sistaFranRuta  = { rad: franRad, kol: franKol };
+  sistaThillRuta = { rad: tillRad, kol: tillKol };
+
+  // === PROMOTION (bonde når sista raden) ===
+  // Promotion är ett specialfall där spelaren väljer ny pjäs
+  if (drag.specialTyp === 'promotion') {
+    valdRuta    = null;
+    mojligaDrag = [];
+    ritaBrade();
+    visaPromotionModal(tillRad, tillKol, pjasFarg, () => {
+      bytaTur();
+    });
+    return;
+  }
+
+  valdRuta    = null;
+  mojligaDrag = [];
+  bytaTur();
+}
+
 
 // ============================================================
 // MENY-NAVIGATION
