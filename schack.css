@@ -308,3 +308,120 @@
     .drag-post { color: var(--text); }
     .drag-nummer { color: var(--text-dim); }
     
+    /* ===== MODAL (schack, matt, remis, promotion) ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box {
+      background: var(--yta);
+      border: 1px solid var(--kant);
+      border-radius: 14px;
+      padding: 30px;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+      animation: slideUpp 0.25s ease;
+    }
+    @keyframes slideUpp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-titel { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; color: var(--accent); }
+    .modal-text { color: var(--text-dim); margin-bottom: 20px; font-size: 0.9rem; }
+    .modal-knappar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .modal-knapp {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .modal-knapp.prim { background: var(--accent); color: #111; }
+    .modal-knapp.prim:hover { background: #f0d060; }
+    .modal-knapp.sek { background: var(--knapp-bg); color: var(--text); border: 1px solid var(--kant); }
+    .modal-knapp.sek:hover { background: var(--knapp-hover); }
+    .promotion-pjasar { display: flex; gap: 12px; justify-content: center; font-size: 2.5rem; margin: 14px 0; }
+    .promotion-pjas {
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .promotion-pjas:hover { border-color: var(--accent); background: rgba(232,200,74,0.1); transform: scale(1.15); }
+
+    /* ===== BOT-TÄNKER ===== */
+    .tanker-indikator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      background: rgba(0,0,0,0.7);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      color: var(--accent);
+      z-index: 10;
+      display: none;
+    }
+    .tanker-indikator.visas { display: block; }
+    .prickar::after {
+      content: '';
+      animation: prickar 1.2s infinite;
+    }
+    @keyframes prickar {
+      0%   { content: '.'; }
+      33%  { content: '..'; }
+      66%  { content: '...'; }
+    }
+
+    /* ===== SCROLLBAR ===== */
+    #dragHistorik::-webkit-scrollbar { width: 4px; }
+    #dragHistorik::-webkit-scrollbar-track { background: transparent; }
+    #dragHistorik::-webkit-scrollbar-thumb { background: var(--kant); border-radius: 2px; }
+
+    /* ===== PJÄSFÄRGER (svart och vit) ===== */
+.pjas.vit-pjas  { filter: brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+.pjas.svart-pjas{ filter: brightness(0) drop-shadow(0 1px 3px rgba(255,255,255,0.2)); }
+
+/* ===== GE UPP / REMI KNAPPAR ===== */
+.spel-knappar {
+  display: flex;
+  gap: 10px;
+  width: var(--bord-storlek);
+  justify-content: center;
+}
+.ge-upp-knapp {
+  flex: 1;
+  padding: 9px 0;
+  background: transparent;
+  border: 1px solid #5a2020;
+  border-radius: 7px;
+  color: #c04040;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.ge-upp-knapp:hover { background: rgba(200,50,50,0.12); border-color: #c04040; }
+
+.remi-knapp {
+  flex: 1;
+  padding: 9px 0;
+  background: transparent;
+  border: 1px solid #3a4a3a;
+  border-radius: 7px;
+  color: #7aaa7a;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.remi-knapp:hover { background: rgba(100,180,100,0.1); border-color: #7aaa7a; }

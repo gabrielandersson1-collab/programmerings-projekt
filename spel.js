@@ -357,6 +357,148 @@ function tillampaRiktigtDrag(drag) {
   bytaTur();
 }
 
+// ============================================================
+// BYTA TUR & KONTROLLERA SPELSLUT
+// ============================================================
+function bytaTur() {
+  // Schackklocka: lägg till inkrement för spelaren som precis drog
+  if (anvandKlocka && inkrementSek > 0) {
+    tidKvar[aktivFarg] += inkrementSek;
+  }
+
+  aktivFarg = -aktivFarg; // Byt till motståndaren
+
+  // Starta/uppdatera klockan
+  if (anvandKlocka) startaKlocka();
+
+  ritaBrade();
+  uppdateraInfoRad();
+  uppdateraTagnaPjasar();
+
+  // Kontrollera spelslut: schackmatt eller pat
+  const alleaDrag = haemtaAllaLegalaDrag(brade, aktivFarg, enPassantMal, kungHarRort, tornHarRort);
+  if (alleaDrag.length === 0) {
+    if (arISchack(brade, aktivFarg)) {
+      // SCHACKMATT
+      if (klockInterval) clearInterval(klockInterval);
+      spelOver = true;
+      setTimeout(() => visaSlutModal('schackmatt', -aktivFarg), 300);
+    } else {
+      // PAT (remis)
+      if (klockInterval) clearInterval(klockInterval);
+      spelOver = true;
+      setTimeout(() => visaSlutModal('pat', null), 300);
+    }
+    return;
+  }
+
+  // Kontrollera otillräckligt material (automatisk remis)
+  if (otillrackligtMaterial()) {
+    if (klockInterval) clearInterval(klockInterval);
+    spelOver = true;
+    setTimeout(() => visaSlutModal('material', null), 300);
+    return;
+  }
+
+  // Uppdatera status-text
+  uppdateraInfoRad();
+
+  // Om det är botens tur i enspelarlage
+  if (spelLage === 'enspelare' && aktivFarg === SVART && !spelOver) {
+    setTimeout(gorBotDrag, 400); // Liten fördröjning – känns mer "mänskligt"
+  }
+}
+
+// ============================================================
+// SCHACKKLOCKA (game loop med setInterval)
+// ============================================================
+function startaKlocka() {
+  if (klockInterval) clearInterval(klockInterval);
+
+  // Uppdaterar klockan varje sekund – en enkel game loop!
+  klockInterval = setInterval(() => {
+    tidKvar[aktivFarg]--;
+    uppdateraKlockor();
+
+    if (tidKvar[aktivFarg] <= 0) {
+      clearInterval(klockInterval);
+      spelOver = true;
+      visaSlutModal('tid', -aktivFarg);
+    }
+  }, 1000);
+}
+
+function uppdateraKlockor() {
+  const vitText   = formateraTid(tidKvar[VIT]);
+  const svartText = formateraTid(tidKvar[SVART]);
+
+  // Vit är alltid nere (spelaren), svart alltid uppe (motståndaren)
+  underKlockaEl.textContent = vitText;
+  overKlockaEl.textContent  = svartText;
+
+  underKlockaEl.classList.toggle('kritisk', tidKvar[VIT]   <= 30 && anvandKlocka);
+  overKlockaEl.classList.toggle('kritisk',  tidKvar[SVART] <= 30 && anvandKlocka);
+
+  // Aktiv tur-markering på spelarkortet
+  underInfoEl.classList.toggle('aktiv-tur', aktivFarg === VIT   && anvandKlocka);
+  overInfoEl.classList.toggle('aktiv-tur',  aktivFarg === SVART && anvandKlocka);
+}
+
+function formateraTid(sek) {
+  const m = Math.floor(Math.max(0, sek) / 60).toString().padStart(2, '0');
+  const s = (Math.max(0, sek) % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+// ============================================================
+// STATUSTEXT
+// ============================================================
+function uppdateraInfoRad() {
+  if (spelOver) return;
+  const iSchack = arISchack(brade, aktivFarg);
+  const vems = aktivFarg === VIT ? 'Vit' : 'Svart';
+  statusTextEl.textContent = iSchack ? `${vems} är i schack!` : `${vems}s tur`;
+
+  // Spela schack-ljud när kungen hamnar i schack
+  if (iSchack) spelaSchackLjud();
+}
+function uppdateraTagnaPjasar() {
+  // Visa tagna pjäser för varje spelare
+  underTagnaEl.textContent = tagnaPjasar[VIT].map(p => PJAS_SYMBOLER[SVART][p]).join('');
+  overTagnaEl.textContent  = tagnaPjasar[SVART].map(p => PJAS_SYMBOLER[VIT][p]).join('');
+}
+
+// ============================================================
+// DRAGHISTORIK (schack-notation)
+// ============================================================
+function byggNotation(drag, pjasTyp, pjasFarg, nyttBrade) {
+  const kol   = 'abcdefgh'[drag.tillKol];
+  const rad   = (8 - drag.tillRad).toString();
+  const namn  = NOTATIONS_NAMN[pjasTyp];
+  let text    = namn + kol + rad;
+  if (drag.specialTyp === 'kortRokad') text = 'O-O';
+  if (drag.specialTyp === 'langRokad') text = 'O-O-O';
+  if (drag.specialTyp === 'promotion') text += '=D'; // Alltid dam om bot; modal för spelare
+  return text;
+}
+
+function uppdateraDragHistorik() {
+  dragHistEl.innerHTML = '';
+  dragHistorikData.forEach((drag, i) => {
+    if (i % 2 === 0) {
+      const nr = document.createElement('span');
+      nr.className = 'drag-nummer';
+      nr.textContent = `${Math.floor(i/2)+1}. `;
+      dragHistEl.appendChild(nr);
+    }
+    const d = document.createElement('span');
+    d.className = 'drag-post';
+    d.textContent = drag + ' ';
+    dragHistEl.appendChild(d);
+  });
+  dragHistEl.scrollTop = dragHistEl.scrollHeight;
+}
+
 
 // ============================================================
 // MENY-NAVIGATION
