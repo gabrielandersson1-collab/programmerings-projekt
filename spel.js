@@ -501,6 +501,73 @@ function uppdateraDragHistorik() {
 
 
 // ============================================================
+// SCHACK-KONTROLL
+// Kollar om 'farg'-kungens position attackeras av motståndaren
+// Kärnan i kollisionsdetekteringen!
+// ============================================================
+function arISchack(brade, farg) {
+  // Hitta kungens position
+  let kungRad = -1, kungKol = -1;
+  for (let r = 0; r < 8; r++) {
+    for (let k = 0; k < 8; k++) {
+      if (brade[r][k] === farg * KUNG) { kungRad = r; kungKol = k; break; }
+    }
+    if (kungRad !== -1) break;
+  }
+  if (kungRad === -1) return false; // Kung hittades inte (bör inte hända)
+
+  const motFarg = -farg;
+  // Generera alla pseudo-drag för motståndaren och kolla om kungen träffas
+  for (let r = 0; r < 8; r++) {
+    for (let k = 0; k < 8; k++) {
+      const p = brade[r][k];
+      if (Math.sign(p) !== motFarg) continue;
+      const pseudoDrag = haemtaPseudoDrag(brade, r, k, motFarg, null, {[VIT]:true,[SVART]:true}, {[VIT]:{vanster:true,hoger:true},[SVART]:{vanster:true,hoger:true}});
+      if (pseudoDrag.some(d => d.tillRad === kungRad && d.tillKol === kungKol)) return true;
+    }
+  }
+  return false;
+}
+
+
+
+// ============================================================
+// HJÄLPFUNKTIONER
+// ============================================================
+function arInomBrade(rad, kol) { return rad >= 0 && rad < 8 && kol >= 0 && kol < 8; }
+
+function lagDrag(fr, fk, tr, tk, special=null) {
+  return { franRad:fr, franKol:fk, tillRad:tr, tillKol:tk, specialTyp:special };
+}
+
+function kopieraBrade(brade) {
+  return brade.map(rad => [...rad]);
+}
+
+// Applicerar ett drag på ett temporärt bräde (används i minimax och schack-kontroll)
+function tillampaTempDrag(tempBrade, drag) {
+  const { franRad, franKol, tillRad, tillKol } = drag;
+  const p = tempBrade[franRad][franKol];
+  const f = p > 0 ? VIT : SVART;
+  tempBrade[tillRad][tillKol] = p;
+  tempBrade[franRad][franKol] = TOM;
+  if (drag.specialTyp === 'kortRokad') {
+    const r = f === VIT ? 7 : 0;
+    tempBrade[r][5] = f * TORN; tempBrade[r][7] = TOM;
+  } else if (drag.specialTyp === 'langRokad') {
+    const r = f === VIT ? 7 : 0;
+    tempBrade[r][3] = f * TORN; tempBrade[r][0] = TOM;
+  } else if (drag.specialTyp === 'enPassant') {
+    tempBrade[franRad][tillKol] = TOM;
+  } else if (drag.specialTyp === 'promotion') {
+    tempBrade[tillRad][tillKol] = f * DAM; // Bot väljer alltid dam
+  }
+}
+
+
+
+
+// ============================================================
 // MENY-NAVIGATION
 // ============================================================
 function visaSpelVy() {
