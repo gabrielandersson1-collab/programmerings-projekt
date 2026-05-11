@@ -707,6 +707,8 @@ function kungDrag(brade, rad, kol, farg, kHarRort, tHarRort) {
 }
 
 
+
+
 // ============================================================
 // SCHACK-KONTROLL
 // Kollar om 'farg'-kungens position attackeras av motståndaren
@@ -737,6 +739,27 @@ function arISchack(brade, farg) {
 }
 
 
+// ============================================================
+// OTILLRÄCKLIGT MATERIAL (automatisk remis)
+// ============================================================
+function otillrackligtMaterial() {
+  const pjasar = { [VIT]: [], [SVART]: [] };
+  for (let r = 0; r < 8; r++) {
+    for (let k = 0; k < 8; k++) {
+      const p = brade[r][k];
+      if (p === TOM) continue;
+      const f = p > 0 ? VIT : SVART;
+      pjasar[f].push(Math.abs(p));
+    }
+  }
+  // Bara kungar kvar – remis
+  if (pjasar[VIT].length === 1 && pjasar[SVART].length === 1) return true;
+  // Kung + löpare mot kung, eller kung + häst mot kung – remis
+  const kol = (arr) => arr.filter(p => p === LOPARE || p === HAST);
+  if (pjasar[VIT].length === 2 && kol(pjasar[VIT]).length === 1 && pjasar[SVART].length === 1) return true;
+  if (pjasar[SVART].length === 2 && kol(pjasar[SVART]).length === 1 && pjasar[VIT].length === 1) return true;
+  return false;
+}
 
 
 // ============================================================
@@ -772,6 +795,128 @@ function tillampaTempDrag(tempBrade, drag) {
   }
 }
 
+// ============================================================
+// BOT: MINIMAX MED ALPHA-BETA PRUNING
+// Alpha-beta pruning är en optimering av minimax-algoritmen
+// som eliminerar grenar som inte kan påverka resultatet
+// ============================================================
+function gorBotDrag() {
+  if (spelOver) return;
+  botTanker = true;
+  tankerEl.classList.add('visas');
+
+  // Kör minimax asynkront med setTimeout så UI:t inte fryser
+  setTimeout(() => {
+    const djup = botNiva === 1 ? 1 : (botNiva === 2 ? 2 : 3);
+    const bastaDrag = minimaxRoot(brade, djup, SVART);
+    botTanker = false;
+    tankerEl.classList.remove('visas');
+
+    if (bastaDrag) {
+      utforDrag(bastaDrag);
+    }
+  }, 50);
+}
+
+function minimaxRoot(brade, djup, farg) {
+  const allaDrag = haemtaAllaLegalaDrag(brade, farg, enPassantMal, kungHarRort, tornHarRort);
+  if (allaDrag.length === 0) return null;
+
+  let bastaDrag   = allaDrag[0];
+  let bastPoang   = -Infinity;
+
+  for (const drag of allaDrag) {
+    const tempBrade = kopieraBrade(brade);
+    tillampaTempDrag(tempBrade, drag);
+    const poang = minimax(tempBrade, djup - 1, -Infinity, Infinity, false, enPassantMal, kungHarRort, tornHarRort);
+    if (poang > bastPoang) {
+      bastPoang = poang;
+      bastaDrag = drag;
+    }
+  }
+  return bastaDrag;
+}
+
+// Minimax-rekursionen – utvärderar positioner och väljer bäst drag
+function minimax(brade, djup, alfa, beta, maximera, epMal, kHarRort, tHarRort) {
+  const evalFarg = SVART; // Boten är alltid svart
+  if (djup === 0) return utvarderatBrade(brade);
+
+  const aktivFarg = maximera ? SVART : VIT;
+  const allaDrag = haemtaAllaLegalaDrag(brade, aktivFarg, epMal, kHarRort, tHarRort);
+
+  if (allaDrag.length === 0) {
+    if (arISchack(brade, aktivFarg)) return maximera ? -100000 : 100000;
+    return 0; // Pat – remis
+  }
+
+  if (maximera) {
+    let maxPoang = -Infinity;
+    for (const drag of allaDrag) {
+      const tempBrade = kopieraBrade(brade);
+      tillampaTempDrag(tempBrade, drag);
+      const poang = minimax(tempBrade, djup - 1, alfa, beta, false, null, kHarRort, tHarRort);
+      maxPoang = Math.max(maxPoang, poang);
+      alfa = Math.max(alfa, poang);
+      if (beta <= alfa) break; // Alpha-beta pruning – skär bort dåliga grenar
+    }
+    return maxPoang;
+  } else {
+    let minPoang = Infinity;
+    for (const drag of allaDrag) {
+      const tempBrade = kopieraBrade(brade);
+      tillampaTempDrag(tempBrade, drag);
+      const poang = minimax(tempBrade, djup - 1, alfa, beta, true, null, kHarRort, tHarRort);
+      minPoang = Math.min(minPoang, poang);
+      beta = Math.min(beta, poang);
+      if (beta <= alfa) break;
+    }
+    return minPoang;
+  }
+}
+
+// ============================================================
+// UTVÄRDERING AV POSITION (poängsättning för bot)
+// Baseras på materiellt värde + positionella bonusar
+// ============================================================
+const PJAS_VARDEN = { [KUNG]:20000, [DAM]:900, [TORN]:500, [LOPARE]:330, [HAST]:320, [BONDE]:100 };
+
+// Positionella bonusar – pjäser är mer värdefulla på bra rutor
+// (Förenklade tabeller, anpassade för Programmering 1-nivå)
+const POS_BONUS = {
+  [BONDE]: [
+    [0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],
+    [5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],
+    [5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]
+  ],
+  [HAST]: [
+    [-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],
+    [-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],
+    [-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]
+  ]
+};
+
+function utvarderatBrade(brade) {
+  let poang = 0;
+  for (let r = 0; r < 8; r++) {
+    for (let k = 0; k < 8; k++) {
+      const p = brade[r][k];
+      if (p === TOM) continue;
+      const f = p > 0 ? VIT : SVART;
+      const typ = Math.abs(p);
+      const varde = PJAS_VARDEN[typ] || 0;
+      // Positional bonus (bara bonde och häst för enkelhetens skull)
+      let posBonus = 0;
+      if (POS_BONUS[typ]) {
+        const row = f === VIT ? r : 7 - r;
+        posBonus = POS_BONUS[typ][row][k];
+      }
+      poang += f * (varde + posBonus);
+    }
+  }
+  return poang; // Positiv = bra för vit, negativ = bra för svart
+}
+
 
 
 
@@ -789,7 +934,7 @@ function visaSpelVy() {
     underKlockaEl.style.display = 'none';
   }
   // Uppdatera spelarnamn
-  overNamnEl.textContent  = spelLage === 'enspelare' ? '🤖 Bot' : 'Svart';
+  overNamnEl.textContent  = spelLage === 'enspelare' ? ' Bot' : 'Svart';
   underNamnEl.textContent = 'Vit';
 }
 

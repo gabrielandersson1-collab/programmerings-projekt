@@ -126,7 +126,7 @@
       text-align: center;
     }
     /* Hover-state (feedback när användaren interagerar) */
-    .val-knapp:hover { background: var(--knapp-hover); border-color: #555; }
+    .val-knapp:hover { background: var(--knapp-hover); border-color: rgb(85, 85, 85); }
     /* Aktiv state (representerar current state i UI) */
     .val-knapp.aktiv { border-color: var(--accent); color: var(--accent); background: rgba(232,200,74,0.1); }
 
