@@ -60,6 +60,10 @@ function visaSpelVy() {
     overKlockaEl.style.display  = 'none';
     underKlockaEl.style.display = 'none';
   }
+  // Visa båda knapprader
+  const visaOverKnappar = spelLage === 'tvaspelare';
+  document.getElementById('overKnappar').style.display = visaOverKnappar ? 'flex' : 'none';
+
   // Uppdatera spelarnamn
   overNamnEl.textContent  = spelLage === 'enspelare' ? ' Bot' : 'Svart';
   underNamnEl.textContent = 'Vit';
