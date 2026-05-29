@@ -28,7 +28,7 @@ let enPassantMal   = null;          // null eller {rad, kol}
 // ===== DRAGHISTORIK =====
 let dragHistorikData = [];          // Array av strängar i schack-notation
 let sistaFranRuta  = null;          // Highlight för senaste draget
-let sistaThillRuta = null;
+let sistaTillRuta = null;
 
 // ===== SCHACKKLOCKA =====
 // Tid kvar för respektive spelare i sekunder

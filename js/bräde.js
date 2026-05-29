@@ -29,7 +29,7 @@ function ritaBrade() {
 
       // Markera senaste drag
       if (sistaFranRuta && sistaFranRuta.rad === rad && sistaFranRuta.kol === kol) rutaEl.classList.add('sist-drag');
-      if (sistaThillRuta && sistaThillRuta.rad === rad && sistaThillRuta.kol === kol) rutaEl.classList.add('sist-drag');
+      if (sistaTillRuta && sistaTillRuta.rad === rad && sistaTillRuta.kol === kol) rutaEl.classList.add('sist-drag');
 
       // Markera vald ruta
       if (valdRuta && valdRuta.rad === rad && valdRuta.kol === kol) rutaEl.classList.add('vald');

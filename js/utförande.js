@@ -108,7 +108,7 @@ function tillampaRiktigtDrag(drag) {
 
   // === SENASTE DRAG (highlight) ===
   sistaFranRuta  = { rad: franRad, kol: franKol };
-  sistaThillRuta = { rad: tillRad, kol: tillKol };
+  sistaTillRuta = { rad: tillRad, kol: tillKol };
 
   // === PROMOTION (bonde når sista raden) ===
   // Promotion är ett specialfall där spelaren väljer ny pjäs
