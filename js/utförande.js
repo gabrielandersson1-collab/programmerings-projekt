@@ -64,7 +64,7 @@ function tillampaRiktigtDrag(drag) {
   const pjasVal  = brade[franRad][franKol];
   const pjasFarg = pjasVal > 0 ? VIT : SVART;
   const pjasTyp  = Math.abs(pjasVal);
-  const motstandarFarg = -pjasFarg;
+  
 
   // Logga tagen pjäs (kollisionsdetektering – en viktig del av spellogiken)
   if (brade[tillRad][tillKol] !== TOM) {

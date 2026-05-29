@@ -15,7 +15,7 @@
  const SVART = -1;  // Svart sida
 
 // Unicode-symboler för pjäserna – används som "sprites" tills riktiga bilder laddas
-// TODO: Byt ut mot riktig spritesheet när bilderna är klara!
+
  const PJAS_SYMBOLER = {
   [VIT]:   { [KUNG]:'♔', [DAM]:'♕', [TORN]:'♖', [LOPARE]:'♗', [HAST]:'♘', [BONDE]:'♙' },
   [SVART]: { [KUNG]:'♚', [DAM]:'♛', [TORN]:'♜', [LOPARE]:'♝', [HAST]:'♞', [BONDE]:'♟' }

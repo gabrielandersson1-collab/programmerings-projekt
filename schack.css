@@ -425,3 +425,30 @@
   letter-spacing: 0.5px;
 }
 .remi-knapp:hover { background: rgba(100,180,100,0.1); border-color: rgb(122, 170, 122); }
+
+/* ===== SPELARINFO (namn och tagna pjäser) ===== */
+.spelar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: var(--bord-storlek);
+  padding: 4px 2px;
+}
+.spelar-namn {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.tagna-pjasar {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.klocka-display {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--klocka-inaktiv);
+  letter-spacing: 1px;
+}
+.klocka-display.kritisk { color: rgb(220, 80, 80); }
