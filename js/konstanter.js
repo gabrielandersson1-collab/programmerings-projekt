@@ -1,5 +1,8 @@
 // ===== KONSTANTER: Pjästyper & färger =====
 // Vi använder heltal för att representera pjäserna i brädet – snabbare än strängar
+// Fördelen är att heltals-jämförelser är snabbare än sträng-jämförelser
+// Alternativet hade varit objekt som { typ: "kung", farg: "vit" } men det
+// hade gjort koden mer komplex och långsammare.
 
  const TOM   = 0;
  const KUNG  = 1;

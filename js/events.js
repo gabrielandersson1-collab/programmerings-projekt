@@ -13,7 +13,6 @@ document.querySelectorAll('.val-knapp').forEach(knapp => {
     // Uppdatera spelkonfigurationen
     if (grupp === 'lage') {
       spelLage = val;
-      document.getElementById('botSvarighetsSektion').style.display = val === 'enspelare' ? 'block' : 'none';
     }
     if (grupp === 'bot')       botNiva     = parseInt(val);
     if (grupp === 'klocka') {

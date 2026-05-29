@@ -36,6 +36,14 @@ function hanteraRutaKlick(rad, kol) {
 // DRAG-GENERERING (kärnan i schacklogiken!)
 // Returnerar ALLA lagliga drag för en pjäs på (rad, kol)
 // ============================================================
+
+// Vi filtrerar pseudo-drag genom att simulera varje drag på en kopia av brädet
+// och kontrollera om den egna kungen hamnar i schack.
+// Alternativet hade varit att "ångra" draget efter kontrollen (s.k. make/unmake),
+// vilket är snabbare men betydligt svårare att implementera korrekt.
+// Vi väljer kopieringsmetoden för enkelhetens skull.
+
+
 function haemtaLegalaDrag(brade, rad, kol, farg, epMal, kHarRort, tHarRort) {
   const pseudoDrag = haemtaPseudoDrag(brade, rad, kol, farg, epMal, kHarRort, tHarRort);
 
@@ -129,6 +137,12 @@ function hastDrag(brade, rad, kol, farg) {
 
 // ===== GLIDER-DRAG (torn, löpare, dam) =====
 // Glider längs riktningarna tills en pjäs eller kanten hittas
+// Torn, löpare och dam delar samma rörelselogik (glider längs riktningar)
+// så vi samlar dem i en generisk funktion istället för tre separata.
+//(Don't Repeat Yourself) och gör koden lättare
+// att underhålla – en buggfix här gäller alla tre pjästyper automatiskt.
+
+
 function gliderDrag(brade, rad, kol, farg, riktningar) {
   const drag = [];
   for (const [dr, dk] of riktningar) {

@@ -1,6 +1,13 @@
 // ============================================================
 // SCHACKKLOCKA (game loop med setInterval)
 // ============================================================
+
+// Klockan implementeras med setInterval istället för requestAnimationFrame
+// eftersom vi bara behöver uppdatera den en gång per sekund, inte 60 gånger.
+// requestAnimationFrame hade fungerat men slösat onödig beräkningskraft.
+// Vi sparar interval-ID:t i klockInterval så att vi kan stoppa klockan
+// exakt när spelet är slut eller turen byts.
+
 function startaKlocka() {
   if (klockInterval) clearInterval(klockInterval);
 

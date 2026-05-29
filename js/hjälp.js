@@ -7,6 +7,11 @@ function lagDrag(fr, fk, tr, tk, special=null) {
   return { franRad:fr, franKol:fk, tillRad:tr, tillKol:tk, specialTyp:special };
 }
 
+// Vi kopierar brädet rad för rad med spread-operatorn (...).
+// En ytlig kopia (brade.slice()) hade inte fungerat eftersom det är
+// en tvådimensionell array – vi hade då kopierat referenserna till
+// raderna, inte själva raderna, vilket hade gett oväntade sidoeffekter.
+
 function kopieraBrade(brade) {
   return brade.map(rad => [...rad]);
 }

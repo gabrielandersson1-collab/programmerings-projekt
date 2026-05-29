@@ -1,7 +1,12 @@
 
 // ===== SPELLÄGE & INSTÄLLNINGAR =====
-// spelLage håller reda på om vi är 1-spelare eller 2-spelare – detta är spelets tillstånd (state)
-let spelLage       = 'tvaspelare';   // 'enspelare' eller 'tvaspelare'
+// spelLage  2-spelare – detta är spelets tillstånd (state)
+// All spelstate samlas i en enda fil för att göra det enkelt att
+// se hela spelets tillstånd på ett ställe (single source of truth).
+// Alternativet hade varit att sprida state över flera filer, men det
+// hade gjort det svårare att debugga och återställa spelet vid omstart.
+
+let spelLage       = 'tvaspelare';   // 'tvaspelare'
 let botNiva        = 2;             // Minimax-sökdjup (svårighetsgrad)
 let anvandKlocka   = false;         // Boolean: ska schackklockan användas?
 let startTidSek    = 600;           // Starttid i sekunder (10 min default)

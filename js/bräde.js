@@ -65,10 +65,3 @@ function ritaBrade() {
     }
   }
 }
-
-// Visa tagna pjäser för varje spelare
-function uppdateraTagnaPjasar() {
-  
-  underTagnaEl.textContent = tagnaPjasar[VIT].map(p => PJAS_SYMBOLER[SVART][p]).join('');
-  overTagnaEl.textContent  = tagnaPjasar[SVART].map(p => PJAS_SYMBOLER[VIT][p]).join('');
-}

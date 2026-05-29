@@ -3,6 +3,13 @@
 // Kollar om 'farg'-kungens position attackeras av motståndaren
 // Kärnan i kollisionsdetekteringen!
 // ============================================================
+
+// Vi kontrollerar schack genom att generera motståndarens alla pseudo-drag
+// och se om något träffar kungen. Alternativet hade varit att hålla en lista
+// över attackerade rutor, men det hade krävt uppdatering efter varje drag
+// vilket är svårare att hålla korrekt. Nuvarande lösning är enklare och
+// tillräckligt snabb för schack.
+
 function arISchack(brade, farg) {
   // Hitta kungens position
   let kungRad = -1, kungKol = -1;

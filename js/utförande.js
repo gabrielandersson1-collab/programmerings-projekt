@@ -3,6 +3,14 @@
 // Drag-objektet innehåller: franRad, franKol, tillRad, tillKol,
 // och ev. specialTyp: 'rokad', 'enPassant', 'promotion'
 // ============================================================
+
+// Animationen skapas genom att ett "flygande" pjäs-element placeras
+// ovanpå sidan med position:fixed och sedan förflyttas med CSS-transition.
+// Alternativet hade varit canvas-animation, men DOM-animation passar bättre
+// här eftersom resten av brädet redan är byggt i HTML-element.
+// requestAnimationFrame används för att synka rörelsen med skärmens
+// uppdateringsfrekvens och undvika hackig animation.
+
 function utforDrag(drag) {
   const { franRad, franKol, tillRad, tillKol } = drag;
 
@@ -130,6 +138,14 @@ function tillampaRiktigtDrag(drag) {
 // ============================================================
 // BYTA TUR & KONTROLLERA SPELSLUT
 // ============================================================
+
+// Spelslutskontroll sker här direkt efter varje drag istället för i en
+// separat game loop. Schack behöver inte en konstant loop eftersom
+// spelet bara uppdateras när en spelare gör ett drag (event-driven).
+// En game loop hade slösat CPU i onödan eftersom brädet är statiskt
+// mellan dragen.
+
+
 function bytaTur() {
   // Schackklocka: lägg till inkrement för spelaren som precis drog
   if (anvandKlocka && inkrementSek > 0) {
@@ -173,8 +189,4 @@ function bytaTur() {
   // Uppdatera status-text
   uppdateraInfoRad();
 
-  // Om det är botens tur i enspelarlage
-  if (spelLage === 'enspelare' && aktivFarg === SVART && !spelOver) {
-    setTimeout(gorBotDrag, 400); // Liten fördröjning – känns mer "mänskligt"
-  }
 }
