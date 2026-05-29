@@ -189,3 +189,33 @@ function erbjudRemi(fran) {
 
   document.getElementById('avslaRemiKnapp').addEventListener('click', stangModal);
 }
+
+// ============================================================
+// SCHACK-LJUD
+// Web Audio API används istället för en ljudfil eftersom det 
+// inte kräver några externa resurser och fungerar i alla webbläsare.
+// när vi försöte med ljud fil så reagerade alltid consolen på det med ett felmeddelande
+// AudioContext skapas en gång globalt – webbläsaren blockerar annars
+// upprepade nya instanser på grund av autoplay-policy.
+// ============================================================
+const ljudCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function spelaSchackLjud() {
+  try {
+    // resume() behövs eftersom webbläsaren pausar AudioContext
+    // tills användaren interagerat med sidan
+    ljudCtx.resume().then(() => {
+      const osc  = ljudCtx.createOscillator();
+      const gain = ljudCtx.createGain();
+      osc.connect(gain);
+      gain.connect(ljudCtx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.3, ljudCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ljudCtx.currentTime + 0.3);
+      osc.start(ljudCtx.currentTime);
+      osc.stop(ljudCtx.currentTime + 0.3);
+    });
+  } catch (e) {
+    // Ljud stöds inte – fortsätt tyst
+  }
+}
