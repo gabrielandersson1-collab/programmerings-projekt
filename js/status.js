@@ -1,7 +1,7 @@
 
 // ===== SPELLÄGE & INSTÄLLNINGAR =====
 // spelLage håller reda på om vi är 1-spelare eller 2-spelare – detta är spelets tillstånd (state)
-let spelLage       = 'enspelare';   // 'enspelare' eller 'tvaspelare'
+let spelLage       = 'tvaspelare';   // 'enspelare' eller 'tvaspelare'
 let botNiva        = 2;             // Minimax-sökdjup (svårighetsgrad)
 let anvandKlocka   = false;         // Boolean: ska schackklockan användas?
 let startTidSek    = 600;           // Starttid i sekunder (10 min default)
